@@ -38,11 +38,19 @@ public class ProductController {
         return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
     }
 
-
     @PutMapping("/{id}")
-    public ResponseEntity<Product> update(@PathVariable Long id, @RequestBody Product p){
+    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @Valid @RequestBody Product product){
         try{
-            return ResponseEntity.ok(productService.updateProduct(id, p));
+            return ResponseEntity.ok(productService.updateProduct(id, product));
+        }catch(RuntimeException e){
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Product> patchProduct(@PathVariable Long id, @RequestBody Product p){
+        try{
+            return ResponseEntity.ok(productService.patchProduct(id, p));
         }catch(RuntimeException e){
             return ResponseEntity.notFound().build();
         }

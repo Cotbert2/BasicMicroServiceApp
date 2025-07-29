@@ -45,6 +45,27 @@ public class CategoryService implements ICategoryService{
     }
 
     @Override
+    public Category patchCategory(Long id, Category category) {
+        Optional<Category> existingCategoryOpt = categoryRepository.findById(id);
+        if (!existingCategoryOpt.isPresent()) {
+            throw new IllegalArgumentException("Category with id " + id + " does not exist");
+        }
+        
+        Category existingCategory = existingCategoryOpt.get();
+        
+        // Solo actualizar campos que no son nulos
+        if (category.getName() != null) {
+            existingCategory.setName(category.getName());
+        }
+        if (category.getDescription() != null) {
+            existingCategory.setDescription(category.getDescription());
+        }
+        // Note: createdAt no se actualiza ya que es immutable (updatable = false)
+        
+        return categoryRepository.save(existingCategory);
+    }
+
+    @Override
     public void deleteCategory(Long id) {
         if(!categoryRepository.findById(id).isPresent()){
             throw new IllegalArgumentException("Category with id " + id + " does not exist");

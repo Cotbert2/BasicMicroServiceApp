@@ -38,11 +38,19 @@ public class CategoryController {
         return new ResponseEntity<>(createdCategory, HttpStatus.CREATED);
     }
 
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<Category> update(@PathVariable Long id, @RequestBody Category category){
+    @PutMapping("/{id}")
+    public ResponseEntity<Category> updateCategory(@PathVariable Long id, @Valid @RequestBody Category category){
         try{
             return ResponseEntity.ok(categoryService.updateCategory(id, category));
+        }catch(RuntimeException e){
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Category> patchCategory(@PathVariable Long id, @RequestBody Category category){
+        try{
+            return ResponseEntity.ok(categoryService.patchCategory(id, category));
         }catch(RuntimeException e){
             return ResponseEntity.notFound().build();
         }

@@ -45,6 +45,29 @@ public class ProductService implements IProductService{
     }
 
     @Override
+    public Product patchProduct(Long id, Product product) {
+        Optional<Product> existingProductOpt = productRepository.findById(id);
+        if (!existingProductOpt.isPresent()) {
+            throw new IllegalArgumentException("Product with id " + id + " does not exist");
+        }
+        
+        Product existingProduct = existingProductOpt.get();
+        
+        // Solo actualizar campos que no son nulos
+        if (product.getName() != null) {
+            existingProduct.setName(product.getName());
+        }
+        if (product.getDescription() != null) {
+            existingProduct.setDescription(product.getDescription());
+        }
+        if (product.getPrice() != null) {
+            existingProduct.setPrice(product.getPrice());
+        }
+        
+        return productRepository.save(existingProduct);
+    }
+
+    @Override
     public void deleteProduct(Long id) {
         if(!productRepository.findById(id).isPresent()){
             throw new IllegalArgumentException("Product with id " + id + " does not exist");
