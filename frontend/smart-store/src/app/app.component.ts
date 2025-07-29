@@ -5,11 +5,13 @@ import { CategoriesComponent } from "./components/categories/categories.componen
 import { ProductsComponent } from "./components/products/products.component";
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { FooterComponent } from "./components/shared/footer/footer.component";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ButtonModule, ProductsComponent, ToastModule, ConfirmDialogModule
-  ],
+  imports: [RouterOutlet, ButtonModule, ProductsComponent, ToastModule, ConfirmDialogModule, FooterComponent],
+  providers: [ConfirmationService, MessageService],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

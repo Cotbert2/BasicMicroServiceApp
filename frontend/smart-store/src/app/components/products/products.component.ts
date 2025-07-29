@@ -5,8 +5,6 @@ import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ProductsService } from '../../services/products.service';
 import { IProduct } from '../../models/Iproducts';
@@ -30,8 +28,6 @@ import { ProductModalComponent } from "./product-modal/product-modal.component";
     ButtonModule,
     CardModule,
     TagModule,
-    ConfirmDialogModule,
-    ToastModule,
     IconFieldModule,
     InputIconModule,
     ToolbarModule,
@@ -40,7 +36,6 @@ import { ProductModalComponent } from "./product-modal/product-modal.component";
     TooltipModule,
     ProductModalComponent
 ],
-  providers: [ConfirmationService, MessageService],
   templateUrl: './products.component.html',
   styleUrl: './products.component.scss'
 })
