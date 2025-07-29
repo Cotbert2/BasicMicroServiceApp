@@ -1,0 +1,111 @@
+<p-card class="mb-4">
+    <div class="">
+        <div class="tool-bar">
+        <p-toolbar [style]="{ 'border-radius': '3rem', 'padding': '1rem 1rem 1rem 1.5rem' }">
+            <ng-template #start>
+                <p-button icon="pi pi-plus" class="mr-2" text severity="secondary" pTooltip="Add"
+                    (onClick)="addCategory()" />
+                <p-button icon="pi pi-print" class="mr-2" text severity="secondary" pTooltip="Print"
+                    (onClick)="printTable()" />
+            </ng-template>
+            <ng-template #center>
+                <p-iconfield iconPosition="left">
+                    <p-inputicon class="pi pi-search" />
+                    <input #searchInput type="text" pInputText placeholder="Search categories..."
+                        [value]="globalFilterValue" (input)="onGlobalFilter($event)" class="w-64" />
+                </p-iconfield>
+                @if (globalFilterValue) {
+                <p-button icon="pi pi-times" class="ml-2" text severity="secondary" pTooltip="Clear filter"
+                    (onClick)="clearFilter()" />
+                } @else {
+                <ng-template #noFilter></ng-template>
+                }
+                <ng-template #noFilter></ng-template>
+            </ng-template>
+            <ng-template #end>
+                <p-splitbutton label="Export" [model]="exportOptions" />
+            </ng-template>
+        </p-toolbar>
+</div>
+        <p-table #dt [value]="categories" [loading]="loading" [paginator]="true" [rows]="10"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} categories"
+            [tableStyle]="{'min-width': '50rem'}" styleClass="p-datatable-gridlines"
+            [globalFilterFields]="['id', 'name', 'description']" dataKey="id" exportFilename="categories">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="id">
+                        ID
+                        <p-sortIcon field="id"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="name">
+                        Name
+                        <p-sortIcon field="name"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="description">
+                        Description
+                    </th>
+                    <th pSortableColumn="createdAt">
+                        Created At
+                        <p-sortIcon field="createdAt"></p-sortIcon>
+                    </th>
+                    <th>
+                        Actions
+                    </th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-category>
+                <tr>
+                    <td>{{ category.id }}</td>
+                    <td>
+                        <strong>{{ category.name }}</strong>
+                    </td>
+                    <td>
+                        <span class="text-sm text-gray-600">{{ category.description || 'No description' }}</span>
+                    </td>
+                    <td>
+                        @if (category.createdAt) {
+                            <span style="display: none;">{{ category.createdAt | date:'yyyy-MM-dd' }}</span>
+                            <p-tag [value]="(category.createdAt | date:'MMM dd, yyyy') || 'Unknown'" [severity]="getDateSeverity(category.createdAt)">
+                            </p-tag>
+                        } @else {
+                            <span class="text-gray-400">Unknown</span>
+                        }
+                    </td>
+                    <td>
+                        <div class="flex gap-2">
+                            <p-button icon="pi pi-eye" severity="info" size="small" [text]="true" [rounded]="true"
+                                pTooltip="View details" (onClick)="viewCategory(category)">
+                            </p-button>
+                            <p-button icon="pi pi-pencil" severity="secondary" size="small" [text]="true"
+                                [rounded]="true" pTooltip="Edit" (onClick)="editCategory(category)">
+                            </p-button>
+                            <p-button icon="pi pi-trash" severity="danger" size="small" [text]="true" [rounded]="true"
+                                pTooltip="Delete" (onClick)="deleteCategory(category.id)">
+                            </p-button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="5" class="text-center py-8">
+                        <div class="flex flex-col items-center gap-3">
+                            <i class="pi pi-inbox text-4xl text-gray-400"></i>
+                            <span class="text-lg text-gray-500">No categories available</span>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+
+        </p-table>
+    </div>
+</p-card>
+
+
+@if (visibleModal) {
+<app-category-modal [visible]="visibleModal" [mode]="modalMode" (close)="onModalClose()" (save)="onCategorySave($event)"
+    [category]="selectedCategory" />
+}

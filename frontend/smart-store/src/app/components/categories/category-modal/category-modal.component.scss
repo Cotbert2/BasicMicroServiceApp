@@ -1,0 +1,41 @@
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.form-button {
+  margin-top: 1rem;
+  align-self: flex-end;
+}
+
+.error-message {
+  color: #e74c3c;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.ng-invalid:not(.ng-pristine) {
+  border-color: #e74c3c !important;
+}
+
+/* Additional styling for better visual hierarchy */
+p-iftalabel label {
+  font-weight: 500;
+  color: #495057;
+}
+
+.form-field:last-of-type {
+  margin-bottom: 0.5rem;
+}

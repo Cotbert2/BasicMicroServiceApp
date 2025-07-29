@@ -1,0 +1,81 @@
+<p-dialog 
+  [header]="header" 
+  [modal]="true" 
+  [(visible)]="visible" 
+  [style]="{ width: '30rem' }"
+  [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+  (onHide)="onModalClose()">
+
+  <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()" class="dialog-form">
+    
+    @if (mode != 'create') {
+      <p-iftalabel class="form-field">
+        <p-iconfield class="full-width">
+          <p-inputicon class="pi pi-hashtag" />
+          <input pInputText id="id" formControlName="id"  autocomplete="off" class="full-width" />
+        </p-iconfield>
+        <label for="id">Id</label>
+      </p-iftalabel>
+    }
+
+    <p-iftalabel class="form-field">
+      <p-iconfield class="full-width">
+        <p-inputicon class="pi pi-tag" />
+        <input 
+          pInputText 
+          id="name" 
+          formControlName="name" 
+          autocomplete="off" 
+          class="full-width"
+          [class.ng-invalid]="isFieldInvalid('name')" />
+      </p-iconfield>
+      <label for="name">Name</label>
+      @if (isFieldInvalid('name')) {
+        <small class="error-message">{{ getFieldError('name') }}</small>
+      }
+    </p-iftalabel>
+
+    <p-iftalabel class="form-field">
+      <p-iconfield class="full-width">
+        <p-inputicon class="pi pi-align-left" />
+        <input 
+          pInputText 
+          id="description" 
+          formControlName="description" 
+          autocomplete="off" 
+          class="full-width"
+          [class.ng-invalid]="isFieldInvalid('description')" />
+      </p-iconfield>
+      <label for="description">Description</label>
+      @if (isFieldInvalid('description')) {
+        <small class="error-message">{{ getFieldError('description') }}</small>
+      }
+    </p-iftalabel>
+
+    @if (mode != 'create') {
+      <p-iftalabel class="form-field">
+        <p-iconfield class="full-width">
+          <p-inputicon class="pi pi-calendar" />
+          <input 
+            pInputText 
+            id="createdAt" 
+            formControlName="createdAt" 
+            autocomplete="off" 
+            class="full-width" />
+        </p-iconfield>
+        <label for="createdAt">Created At</label>
+      </p-iftalabel>
+    }
+
+    @if (mode != 'view') {
+      <p-button 
+        [label]="mode | titlecase" 
+        icon="pi pi-check" 
+        type="submit"
+        class="form-button"
+        [disabled]="categoryForm.invalid"
+      ></p-button>
+    }
+
+  </form>
+</p-dialog>
