@@ -17,7 +17,7 @@ services:
 
   categories:
     container_name: categories_microservice
-    image: categories_microservice
+    image: cotbert2/categories_microservice
     restart: unless-stopped
     ports:
       - "8082:8082"
@@ -33,7 +33,7 @@ services:
 
   products:
     container_name: products_microservice
-    image: products_microservice
+    image: cotbert2/products_microservice
     restart: unless-stopped
     ports:
       - "8081:8081"
