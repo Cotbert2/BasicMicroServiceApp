@@ -81,7 +81,6 @@ export class ProductsService extends BaseService {
         next: (products) => this.productsSubject.next(products),
         error: (error) => {
           this.logError('ProductsService', 'loadProducts', error);
-          // En caso de error, mantener un array vacío
           this.productsSubject.next([]);
         }
       });

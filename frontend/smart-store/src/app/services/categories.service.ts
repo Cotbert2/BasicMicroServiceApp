@@ -81,7 +81,6 @@ export class CategoriesService extends BaseService {
         next: (categories) => this.categoriesSubject.next(categories),
         error: (error) => {
           this.logError('CategoriesService', 'loadCategories', error);
-          // En caso de error, mantener un array vacío
           this.categoriesSubject.next([]);
         }
       });
