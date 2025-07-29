@@ -216,7 +216,11 @@ export class CategoriesComponent implements OnInit {
 
   exportToCsv() {
     try {
-      this.dt.exportCSV();
+      if (this.dt && this.dt.exportCSV) {
+        this.dt.exportCSV();
+      } else {
+        this.exportToCsvManual();
+      }
       this.messageService.add({
         severity: 'success',
         summary: 'Success',
@@ -224,11 +228,51 @@ export class CategoriesComponent implements OnInit {
       });
     } catch (error) {
       console.error('Error exporting to CSV:', error);
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Error exporting categories to CSV. Please try again.'
-      });
+      try {
+        this.exportToCsvManual();
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Categories exported to CSV successfully'
+        });
+      } catch (manualError) {
+        console.error('Error with manual CSV export:', manualError);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Error exporting categories to CSV. Please try again.'
+        });
+      }
+    }
+  }
+
+  private exportToCsvManual() {
+    const headers = ['ID', 'Name', 'Description', 'Created At'];
+    
+    const csvData = this.categories.map(category => [
+      category.id.toString(),
+      `"${category.name.replace(/"/g, '""')}"`, 
+      `"${(category.description || 'No description').replace(/"/g, '""')}"`, 
+      category.createdAt ? new Date(category.createdAt).toLocaleDateString() : 'Unknown'
+    ]);
+    
+    const csvContent = [
+      headers.join(','),
+      ...csvData.map(row => row.join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `categories-${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     }
   }
 
@@ -267,7 +311,6 @@ export class CategoriesComponent implements OnInit {
       }
     });
     
-    // Save the PDF
     doc.save('categories-report.pdf');
     
     this.messageService.add({
