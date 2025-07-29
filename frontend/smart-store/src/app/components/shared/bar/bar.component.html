@@ -1,0 +1,16 @@
+<p-toolbar [style]="{ 'border-radius': '3rem', 'padding': '1rem 1rem 1rem 1.5rem' }">
+    <ng-template #start>
+        <p-button icon="pi pi-plus" class="mr-2" text severity="secondary" pTooltip="Add" />
+        <p-button icon="pi pi-print" class="mr-2" text severity="secondary" pTooltip="Print" />
+        <p-button icon="pi pi-upload" text severity="secondary" pTooltip="Upload" />
+    </ng-template>
+    <ng-template #center>
+        <p-iconfield iconPosition="left">
+            <p-inputicon class="pi pi-search" />
+            <input type="text" pInputText placeholder="Search" />
+        </p-iconfield>
+    </ng-template>
+    <ng-template #end>
+        <p-splitbutton label="Export"  [model]="exportOptions"/>
+    </ng-template>
+</p-toolbar>
