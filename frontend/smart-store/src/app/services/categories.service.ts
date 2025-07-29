@@ -30,7 +30,7 @@ export class CategoriesService extends BaseService {
       );
   }
 
-  addCategory(category: Omit<ICategory, 'id'>): Observable<ICategory> {
+  addCategory(category: Omit<ICategory, 'id' | 'createdAt'>): Observable<ICategory> {
     return this.http.post<ICategory>(API_URLS.CATEGORIES.BASE, category)
       .pipe(
         retry(HTTP_CONFIG.RETRY_ATTEMPTS),

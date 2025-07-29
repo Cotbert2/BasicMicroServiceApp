@@ -31,7 +31,7 @@ export class CategoryModalComponent implements OnInit, OnChanges {
   @Input() mode : 'create' | 'edit' | 'view' = 'create';
   @Input() visible: boolean = true;
   @Output() close = new EventEmitter<void>();
-  @Output() save = new EventEmitter<Omit<ICategory, 'id'>>();
+  @Output() save = new EventEmitter<Omit<ICategory, 'id' | 'createdAt'>>();
 
   headers: Record<'create' | 'edit' | 'view', string> = {
     create: 'Create Category',
@@ -110,10 +110,9 @@ export class CategoryModalComponent implements OnInit, OnChanges {
   onSubmit() {
     if (this.categoryForm.valid && this.mode !== 'view') {
       const formValue = this.categoryForm.value;
-      const categoryData: Omit<ICategory, 'id'> = {
+      const categoryData: Omit<ICategory, 'id' | 'createdAt'> = {
         name: formValue.name,
-        description: formValue.description || undefined,
-        createdAt: this.mode === 'create' ? new Date() : this.category?.createdAt
+        description: formValue.description || undefined
       };
       
       console.log('Form submitted:', categoryData);

@@ -80,7 +80,7 @@ export class CategoriesComponent implements OnInit {
     this.visibleModal = true;
   }
 
-  onCategorySave(categoryData: Omit<ICategory, 'id'>) {
+  onCategorySave(categoryData: Omit<ICategory, 'id' | 'createdAt'>) {
     console.log('Saving category:', categoryData);
     
     if (this.modalMode === 'create') {
