@@ -172,20 +172,12 @@ export class ProductsComponent implements OnInit {
       accept: () => {
         this.productsService.deleteProduct(id).subscribe({
           next: (success) => {
-            if (success) {
-                this.loadProducts();
-                this.messageService.add({
-                  severity: 'success', 
-                  summary: 'Success', 
-                  detail: 'Product deleted successfully'
-                });
-            } else {
-                this.messageService.add({
-                  severity: 'error', 
-                  summary: 'Error', 
-                  detail: 'Could not delete the product'
-                });
-            }
+            this.loadProducts();
+            this.messageService.add({
+              severity: 'success', 
+              summary: 'Success', 
+              detail: 'Product deleted successfully'
+            });
           },
           error: (error) => {
             console.error('Error deleting product:', error);

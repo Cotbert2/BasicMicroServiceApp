@@ -1,101 +1,89 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, BehaviorSubject } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, of, BehaviorSubject, throwError } from 'rxjs';
+import { catchError, tap, retry } from 'rxjs/operators';
 import { ICategory } from '../models/Icategories';
+import { API_URLS, HTTP_CONFIG } from '../config/constants';
+import { BaseService } from './base.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class CategoriesService {
+export class CategoriesService extends BaseService {
 
-  private mockCategories: ICategory[] = [
-    {
-      id: 1,
-      name: 'Electronics',
-      description: 'Electronic devices and gadgets',
-      createdAt: new Date('2024-01-15')
-    },
-    {
-      id: 2,
-      name: 'Clothing',
-      description: 'Fashion and apparel items',
-      createdAt: new Date('2024-01-20')
-    },
-    {
-      id: 3,
-      name: 'Home & Garden',
-      description: 'Home improvement and gardening products',
-      createdAt: new Date('2024-02-01')
-    },
-    {
-      id: 4,
-      name: 'Sports',
-      description: 'Sports equipment and accessories',
-      createdAt: new Date('2024-02-10')
-    },
-    {
-      id: 5,
-      name: 'Books',
-      description: 'Books and educational materials',
-      createdAt: new Date('2024-02-15')
-    },
-    {
-      id: 6,
-      name: 'Health & Beauty',
-      description: 'Health care and beauty products',
-      createdAt: new Date('2024-03-01')
-    }
-  ];
+  private categoriesSubject = new BehaviorSubject<ICategory[]>([]);
 
-  private categoriesSubject = new BehaviorSubject<ICategory[]>(this.mockCategories);
-
-  constructor() { }
+  constructor(private http: HttpClient) { 
+    super();
+    this.loadCategories();
+  }
 
   getCategories(): Observable<ICategory[]> {
     return this.categoriesSubject.asObservable();
   }
 
-  getCategoryById(id: number): Observable<ICategory | undefined> {
-    const category = this.mockCategories.find(c => c.id === id);
-    return of(category);
+  getCategoryById(id: number): Observable<ICategory> {
+    return this.http.get<ICategory>(API_URLS.CATEGORIES.BY_ID(id))
+      .pipe(
+        retry(HTTP_CONFIG.RETRY_ATTEMPTS),
+        catchError(this.handleError)
+      );
   }
 
   addCategory(category: Omit<ICategory, 'id'>): Observable<ICategory> {
-    const newCategory: ICategory = {
-      id: this.generateId(),
-      ...category,
-      createdAt: category.createdAt || new Date()
-    };
-    this.mockCategories.push(newCategory);
-    this.categoriesSubject.next([...this.mockCategories]);
-    return of(newCategory);
+    return this.http.post<ICategory>(API_URLS.CATEGORIES.BASE, category)
+      .pipe(
+        retry(HTTP_CONFIG.RETRY_ATTEMPTS),
+        tap(newCategory => {
+          const currentCategories = this.categoriesSubject.value;
+          this.categoriesSubject.next([...currentCategories, newCategory]);
+        }),
+        catchError(this.handleError)
+      );
   }
 
-  updateCategory(id: number, updatedCategory: Partial<ICategory>): Observable<ICategory | null> {
-    const index = this.mockCategories.findIndex(c => c.id === id);
-    if (index !== -1) {
-      this.mockCategories[index] = { 
-        ...this.mockCategories[index], 
-        ...updatedCategory,
-        // Preserve the original createdAt date
-        createdAt: this.mockCategories[index].createdAt
-      };
-      this.categoriesSubject.next([...this.mockCategories]);
-      return of(this.mockCategories[index]);
-    }
-    return of(null);
+  updateCategory(id: number, updatedCategory: Partial<ICategory>): Observable<ICategory> {
+    return this.http.put<ICategory>(API_URLS.CATEGORIES.BY_ID(id), updatedCategory)
+      .pipe(
+        retry(HTTP_CONFIG.RETRY_ATTEMPTS),
+        tap(updated => {
+          const currentCategories = this.categoriesSubject.value;
+          const index = currentCategories.findIndex(c => c.id === id);
+          if (index !== -1) {
+            currentCategories[index] = updated;
+            this.categoriesSubject.next([...currentCategories]);
+          }
+        }),
+        catchError(this.handleError)
+      );
   }
 
-  deleteCategory(id: number): Observable<boolean> {
-    const index = this.mockCategories.findIndex(c => c.id === id);
-    if (index !== -1) {
-      this.mockCategories.splice(index, 1);
-      this.categoriesSubject.next([...this.mockCategories]);
-      return of(true);
-    }
-    return of(false);
+  deleteCategory(id: number): Observable<void> {
+    return this.http.delete<void>(API_URLS.CATEGORIES.BY_ID(id))
+      .pipe(
+        retry(HTTP_CONFIG.RETRY_ATTEMPTS),
+        tap(() => {
+          const currentCategories = this.categoriesSubject.value;
+          const filteredCategories = currentCategories.filter(c => c.id !== id);
+          this.categoriesSubject.next(filteredCategories);
+        }),
+        catchError(this.handleError)
+      );
   }
 
-  private generateId(): number {
-    return Math.max(...this.mockCategories.map(c => c.id)) + 1;
+  private loadCategories(): void {
+    this.http.get<ICategory[]>(API_URLS.CATEGORIES.BASE)
+      .pipe(
+        retry(HTTP_CONFIG.RETRY_ATTEMPTS),
+        catchError(this.handleError)
+      )
+      .subscribe({
+        next: (categories) => this.categoriesSubject.next(categories),
+        error: (error) => {
+          this.logError('CategoriesService', 'loadCategories', error);
+          // En caso de error, mantener un array vacío
+          this.categoriesSubject.next([]);
+        }
+      });
   }
 }

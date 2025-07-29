@@ -1,90 +1,89 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, of, BehaviorSubject, throwError } from 'rxjs';
+import { catchError, tap, retry } from 'rxjs/operators';
 import { IProduct } from '../models/Iproducts';
+import { API_URLS, HTTP_CONFIG } from '../config/constants';
+import { BaseService } from './base.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ProductsService {
+export class ProductsService extends BaseService {
 
-  private mockProducts: IProduct[] = [
-    {
-      id: 1,
-      name: 'Laptop Gaming',
-      description: 'Laptop de alta gama para gaming con procesador Intel i7 y tarjeta gráfica RTX 4060',
-      price: 1299.99
-    },
-    {
-      id: 2,
-      name: 'Smartphone Pro',
-      description: 'Teléfono inteligente con cámara de 108MP y 256GB de almacenamiento',
-      price: 899.99
-    },
-    {
-      id: 3,
-      name: 'Auriculares Bluetooth',
-      description: 'Auriculares inalámbricos con cancelación de ruido activa',
-      price: 249.99
-    },
-    {
-      id: 4,
-      name: 'Monitor 4K',
-      description: 'Monitor UltraHD de 27 pulgadas ideal para diseño y gaming',
-      price: 599.99
-    },
-    {
-      id: 5,
-      name: 'Teclado Mecánico',
-      description: 'Teclado gaming mecánico con switches cherry MX y iluminación RGB',
-      price: 159.99
-    },
-    {
-      id: 6,
-      name: 'Mouse Gamer',
-      description: 'Mouse óptico de alta precisión con 16000 DPI',
-      price: 79.99
-    }
-  ];
+  private productsSubject = new BehaviorSubject<IProduct[]>([]);
 
-  constructor() { }
-
-  getProducts(): Observable<IProduct[]> {
-    return of(this.mockProducts);
+  constructor(private http: HttpClient) { 
+    super();
+    this.loadProducts();
   }
 
-  getProductById(id: number): Observable<IProduct | undefined> {
-    const product = this.mockProducts.find(p => p.id === id);
-    return of(product);
+  getProducts(): Observable<IProduct[]> {
+    return this.productsSubject.asObservable();
+  }
+
+  getProductById(id: number): Observable<IProduct> {
+    return this.http.get<IProduct>(API_URLS.PRODUCTS.BY_ID(id))
+      .pipe(
+        retry(HTTP_CONFIG.RETRY_ATTEMPTS),
+        catchError(this.handleError)
+      );
   }
 
   addProduct(product: Omit<IProduct, 'id'>): Observable<IProduct> {
-    const newProduct: IProduct = {
-      id: this.generateId(),
-      ...product
-    };
-    this.mockProducts.push(newProduct);
-    return of(newProduct);
+    return this.http.post<IProduct>(API_URLS.PRODUCTS.BASE, product)
+      .pipe(
+        retry(HTTP_CONFIG.RETRY_ATTEMPTS),
+        tap(newProduct => {
+          const currentProducts = this.productsSubject.value;
+          this.productsSubject.next([...currentProducts, newProduct]);
+        }),
+        catchError(this.handleError)
+      );
   }
 
-  updateProduct(id: number, updatedProduct: Partial<IProduct>): Observable<IProduct | null> {
-    const index = this.mockProducts.findIndex(p => p.id === id);
-    if (index !== -1) {
-      this.mockProducts[index] = { ...this.mockProducts[index], ...updatedProduct };
-      return of(this.mockProducts[index]);
-    }
-    return of(null);
+  updateProduct(id: number, updatedProduct: Partial<IProduct>): Observable<IProduct> {
+    return this.http.put<IProduct>(API_URLS.PRODUCTS.BY_ID(id), updatedProduct)
+      .pipe(
+        retry(HTTP_CONFIG.RETRY_ATTEMPTS),
+        tap(updated => {
+          const currentProducts = this.productsSubject.value;
+          const index = currentProducts.findIndex(p => p.id === id);
+          if (index !== -1) {
+            currentProducts[index] = updated;
+            this.productsSubject.next([...currentProducts]);
+          }
+        }),
+        catchError(this.handleError)
+      );
   }
 
-  deleteProduct(id: number): Observable<boolean> {
-    const index = this.mockProducts.findIndex(p => p.id === id);
-    if (index !== -1) {
-      this.mockProducts.splice(index, 1);
-      return of(true);
-    }
-    return of(false);
+  deleteProduct(id: number): Observable<void> {
+    return this.http.delete<void>(API_URLS.PRODUCTS.BY_ID(id))
+      .pipe(
+        retry(HTTP_CONFIG.RETRY_ATTEMPTS),
+        tap(() => {
+          const currentProducts = this.productsSubject.value;
+          const filteredProducts = currentProducts.filter(p => p.id !== id);
+          this.productsSubject.next(filteredProducts);
+        }),
+        catchError(this.handleError)
+      );
   }
 
-  private generateId(): number {
-    return Math.max(...this.mockProducts.map(p => p.id)) + 1;
+  private loadProducts(): void {
+    this.http.get<IProduct[]>(API_URLS.PRODUCTS.BASE)
+      .pipe(
+        retry(HTTP_CONFIG.RETRY_ATTEMPTS),
+        catchError(this.handleError)
+      )
+      .subscribe({
+        next: (products) => this.productsSubject.next(products),
+        error: (error) => {
+          this.logError('ProductsService', 'loadProducts', error);
+          // En caso de error, mantener un array vacío
+          this.productsSubject.next([]);
+        }
+      });
   }
 }

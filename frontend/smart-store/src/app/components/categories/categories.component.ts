@@ -172,21 +172,13 @@ export class CategoriesComponent implements OnInit {
       rejectLabel: 'Cancel',
       accept: () => {
         this.categoriesService.deleteCategory(id).subscribe({
-          next: (success) => {
-            if (success) {
-                this.loadCategories();
-                this.messageService.add({
-                  severity: 'success', 
-                  summary: 'Success', 
-                  detail: 'Category deleted successfully'
-                });
-            } else {
-                this.messageService.add({
-                  severity: 'error', 
-                  summary: 'Error', 
-                  detail: 'Could not delete the category'
-                });
-            }
+          next: () => {
+            this.loadCategories();
+            this.messageService.add({
+              severity: 'success', 
+              summary: 'Success', 
+              detail: 'Category deleted successfully'
+            });
           },
           error: (error) => {
             console.error('Error deleting category:', error);
