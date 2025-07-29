@@ -1,8 +1,50 @@
 /* You can add global styles to this file, and also import other style files */
 @import "primeicons/primeicons.css";
 
+:root {
+  --primary-color: #667eea;
+  --primary-color-light: #7c8ef7;
+  --primary-color-dark: #5a6fd8;
+  --surface-ground: #f8f9fa;
+  --surface-section: #ffffff;
+  --text-color: #495057;
+  --text-color-secondary: #6c757d;
+}
 
-*{
+* {
     box-sizing: border-box;
-    font-family: Roboto, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--surface-ground);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.p-button {
+    transition: all 0.3s ease;
+}
+
+.p-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+// Smooth transitions for route changes
+router-outlet + * {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

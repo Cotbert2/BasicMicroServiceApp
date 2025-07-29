@@ -1,0 +1,36 @@
+.custom-menubar {
+  border-radius: 0;
+  border: none;
+  border-bottom: 1px solid #e9ecef;
+  background: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 2rem;
+  
+  .logo-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--primary-color);
+  }
+}
+
+:host ::ng-deep .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-link {
+  padding: 1rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background-color: var(--primary-color);
+    color: white;
+  }
+  
+  &.router-link-active {
+    background-color: var(--primary-color);
+    color: white;
+  }
+}

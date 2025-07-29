@@ -1,44 +1,49 @@
-$green-light: #a8e6cf;
-$green-dark: #2e7d6e;
-$text: #ffffff;
+:root {
+    --primary-color: #667eea;
+    --primary-color-light: #7c8ef7;
+    --primary-color-dark: #5a6fd8;
+    --surface-ground: #f8f9fa;
+    --surface-section: #ffffff;
+    --text-color: #495057;
+    --text-color-secondary: #6c757d;
+}
 
 .footer {
-  background-color: $green-dark;
-  color: $text;
-  font-size: 0.8rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 1rem;
-  font-family: 'Segoe UI', sans-serif;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-
-  .footer__brand {
-    color: $green-light;
-    flex: 1;
-  }
-
-  .footer__social {
+    background-color: var(--primary-color-dark);
+    color: var(--surface-section);
+    font-size: 0.8rem;
     display: flex;
-    gap: 0.75rem;
-    justify-content: center;
-    flex: 1;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    font-family: 'Segoe UI', sans-serif;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 
-    a {
-      color: $text;
-      font-size: 1rem;
-      transition: color 0.3s;
-
-      &:hover {
-        color: $green-light;
-      }
+    .footer__brand {
+        color: var(--surface-ground);
+        flex: 1;
     }
-  }
 
-  .footer__contact {
-    text-align: right;
-    opacity: 0.8;
-    flex: 1;
-  }
+    .footer__social {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: center;
+        flex: 1;
+
+        a {
+            color: var(--surface-section);
+            font-size: 1rem;
+            transition: color 0.3s;
+
+       
+        }
+    }
+
+    .footer__contact {
+        text-align: right;
+        opacity: 0.8;
+        flex: 1;
+        color: var(--surface-ground);
+    }
 }

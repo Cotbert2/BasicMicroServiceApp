@@ -1,0 +1,95 @@
+<div class="home-container">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content" pAnimateOnScroll animateOnScrollOptions="{threshold: 0.5, root: null}">
+      <div class="hero-text">
+        <h1 class="hero-title">Welcome to Smart Store</h1>
+        <p class="hero-subtitle">
+          Explore our complete catalog of products organized by categories
+        </p>
+      </div>
+      
+      <div class="stats-container">
+        <div class="stat-card" (click)="navigateToProducts()">
+          <div class="stat-icon products-icon">
+            <i class="pi pi-shopping-cart"></i>
+          </div>
+          <div class="stat-content">
+            <h3 class="stat-number">{{ productsCount }}</h3>
+            <p class="stat-label">Available Products</p>
+          </div>
+        </div>
+        
+        <div class="stat-card" (click)="navigateToCategories()">
+          <div class="stat-icon categories-icon">
+            <i class="pi pi-tags"></i>
+          </div>
+          <div class="stat-content">
+            <h3 class="stat-number">{{ categoriesCount }}</h3>
+            <p class="stat-label">Categories</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="cta-buttons">
+        <p-button 
+          label="View Products" 
+          icon="pi pi-shopping-cart"
+          styleClass="p-button-lg p-button-primary"
+          (onClick)="navigateToProducts()">
+        </p-button>
+        
+        <p-button 
+          label="View Categories" 
+          icon="pi pi-tags"
+          styleClass="p-button-lg p-button-outlined"
+          (onClick)="navigateToCategories()">
+        </p-button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Overview Section -->
+  <section class="overview-section">
+    <div class="section-header">
+      <h2>Quick Overview</h2>
+      <p>Take a look at our latest products and categories</p>
+    </div>
+    
+    <div class="overview-grid">
+      <div class="overview-card">
+        <h3>Featured Products</h3>
+        <div class="preview-list">
+          <div *ngFor="let product of products.slice(0, 3)" class="preview-item">
+            <i class="pi pi-box"></i>
+            <span>{{ product.name }}</span>
+            <span class="price">${{ product.price }}</span>
+          </div>
+        </div>
+        <p-button 
+          label="View All" 
+          icon="pi pi-arrow-right"
+          styleClass="p-button-text"
+          (onClick)="navigateToProducts()">
+        </p-button>
+      </div>
+      
+      <div class="overview-card">
+        <h3>Top Categories</h3>
+        <div class="preview-list">
+          <div *ngFor="let category of categories.slice(0, 3)" class="preview-item">
+            <i class="pi pi-tag"></i>
+            <span>{{ category.name }}</span>
+            <span class="description">{{ category.description }}</span>
+          </div>
+        </div>
+        <p-button 
+          label="View All" 
+          icon="pi pi-arrow-right"
+          styleClass="p-button-text"
+          (onClick)="navigateToCategories()">
+        </p-button>
+      </div>
+    </div>
+  </section>
+</div>
