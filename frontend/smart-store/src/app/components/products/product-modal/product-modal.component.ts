@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, OnChanges, Output, EventEmitter } from '@angular/core';
 import { DialogModule } from 'primeng/dialog';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
 import { InputIconModule } from 'primeng/inputicon';
 import { IftaLabelModule} from 'primeng/iftalabel';
@@ -8,6 +8,15 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { IProduct } from '../../../models';
 import { ButtonModule } from 'primeng/button';
 import { TitleCasePipe } from '@angular/common';
+
+// Custom validators
+function noWhitespaceValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (!control.value) return null;
+    const isWhitespace = (control.value || '').trim().length === 0;
+    return isWhitespace ? { whitespace: true } : null;
+  };
+}
 
 @Component({
   selector: 'app-product-modal',
@@ -42,8 +51,8 @@ export class ProductModalComponent implements OnInit, OnChanges {
   constructor(private fb: FormBuilder) {
     this.productForm = this.fb.group({
       id: [{value: '', disabled: true}],
-      name: ['', [Validators.required, Validators.maxLength(20)]],
-      description: ['', [Validators.required, Validators.maxLength(30)]],
+      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50), noWhitespaceValidator()]],
+      description: ['', [Validators.required, Validators.maxLength(255), noWhitespaceValidator()]],
       price: ['', [Validators.required, Validators.min(0.01)]]
     });
   }
@@ -98,9 +107,16 @@ export class ProductModalComponent implements OnInit, OnChanges {
       if (field.errors['required']) {
         return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} is required`;
       }
+      if (field.errors['minlength']) {
+        const minLength = field.errors['minlength'].requiredLength;
+        return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} must have at least ${minLength} characters`;
+      }
       if (field.errors['maxlength']) {
         const maxLength = field.errors['maxlength'].requiredLength;
         return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} cannot exceed ${maxLength} characters`;
+      }
+      if (field.errors['whitespace']) {
+        return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} cannot be only whitespace`;
       }
       if (field.errors['min']) {
         return 'Price must be at least $0.01';
@@ -113,8 +129,8 @@ export class ProductModalComponent implements OnInit, OnChanges {
     if (this.productForm.valid && this.mode !== 'view') {
       const formValue = this.productForm.value;
       const productData: Omit<IProduct, 'id'> = {
-        name: formValue.name,
-        description: formValue.description,
+        name: formValue.name?.trim(),
+        description: formValue.description?.trim(),
         price: parseFloat(formValue.price)
       };
       

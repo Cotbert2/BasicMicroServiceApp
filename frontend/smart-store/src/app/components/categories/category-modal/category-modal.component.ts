@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, OnChanges, Output, EventEmitter } from '@angular/core';
 import { DialogModule } from 'primeng/dialog';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputIconModule } from 'primeng/inputicon';
 import { IftaLabelModule} from 'primeng/iftalabel';
@@ -8,6 +8,26 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { ICategory } from '../../../models';
 import { ButtonModule } from 'primeng/button';
 import { TitleCasePipe } from '@angular/common';
+
+// Custom validators
+function noWhitespaceValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (!control.value) return null;
+    const isWhitespace = (control.value || '').trim().length === 0;
+    return isWhitespace ? { whitespace: true } : null;
+  };
+}
+
+function trimValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (!control.value) return null;
+    const trimmed = control.value.trim();
+    if (control.value !== trimmed) {
+      control.setValue(trimmed);
+    }
+    return null;
+  };
+}
 
 @Component({
   selector: 'app-category-modal',
@@ -42,8 +62,8 @@ export class CategoryModalComponent implements OnInit, OnChanges {
   constructor(private fb: FormBuilder) {
     this.categoryForm = this.fb.group({
       id: [{value: '', disabled: true}],
-      name: ['', [Validators.required, Validators.maxLength(50)]],
-      description: ['', [Validators.maxLength(200)]],
+      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50), noWhitespaceValidator()]],
+      description: ['', [Validators.maxLength(200), noWhitespaceValidator()]],
       createdAt: [{value: '', disabled: true}]
     });
   }
@@ -99,9 +119,16 @@ export class CategoryModalComponent implements OnInit, OnChanges {
       if (field.errors['required']) {
         return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} is required`;
       }
+      if (field.errors['minlength']) {
+        const minLength = field.errors['minlength'].requiredLength;
+        return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} must have at least ${minLength} characters`;
+      }
       if (field.errors['maxlength']) {
         const maxLength = field.errors['maxlength'].requiredLength;
         return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} cannot exceed ${maxLength} characters`;
+      }
+      if (field.errors['whitespace']) {
+        return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} cannot be only whitespace`;
       }
     }
     return '';
@@ -111,8 +138,8 @@ export class CategoryModalComponent implements OnInit, OnChanges {
     if (this.categoryForm.valid && this.mode !== 'view') {
       const formValue = this.categoryForm.value;
       const categoryData: Omit<ICategory, 'id' | 'createdAt'> = {
-        name: formValue.name,
-        description: formValue.description || undefined
+        name: formValue.name?.trim(),
+        description: formValue.description?.trim() || undefined
       };
       
       console.log('Form submitted:', categoryData);

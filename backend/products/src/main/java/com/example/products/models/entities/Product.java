@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import javax.annotation.processing.Generated;
 
@@ -14,10 +15,13 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @NotBlank
+    @Column(nullable = false, unique = true, length = 50)
+    @Size(min = 3, message = "The name must have at least 3 characters")
+    @NotBlank(message = "Name cannot be blank")
     private String name;
 
-    @NotBlank
+    @Column(length = 255)
+    @NotBlank(message = "Description cannot be blank")
     private String description;
 
     @NotNull
