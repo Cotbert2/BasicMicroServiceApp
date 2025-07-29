@@ -64,11 +64,79 @@ export class ProductsComponent implements OnInit {
     this.selectedProduct = undefined;
   }
 
+  addProduct() {
+    console.log('Adding new product');
+    this.modalMode = 'create';
+    this.selectedProduct = undefined;
+    this.visibleModal = true;
+  }
+
+  editProduct(product: IProduct) {
+    console.log('Editing product:', product);
+    this.modalMode = 'edit';
+    this.selectedProduct = product;
+    this.visibleModal = true;
+  }
+
   viewProduct(product: IProduct) {
     console.log('Viewing product:', product);
     this.modalMode = 'view';
     this.selectedProduct = product;
     this.visibleModal = true;
+  }
+
+  onProductSave(productData: Omit<IProduct, 'id'>) {
+    console.log('Saving product:', productData);
+    
+    if (this.modalMode === 'create') {
+      this.productsService.addProduct(productData).subscribe({
+        next: (newProduct) => {
+          this.loadProducts();
+          this.visibleModal = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Product created successfully'
+          });
+        },
+        error: (error) => {
+          console.error('Error creating product:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Error creating product. Please try again.'
+          });
+        }
+      });
+    } else if (this.modalMode === 'edit' && this.selectedProduct) {
+      this.productsService.updateProduct(this.selectedProduct.id, productData).subscribe({
+        next: (updatedProduct) => {
+          if (updatedProduct) {
+            this.loadProducts();
+            this.visibleModal = false;
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'Product updated successfully'
+            });
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Product not found'
+            });
+          }
+        },
+        error: (error) => {
+          console.error('Error updating product:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Error updating product. Please try again.'
+          });
+        }
+      });
+    }
   }
 
 
