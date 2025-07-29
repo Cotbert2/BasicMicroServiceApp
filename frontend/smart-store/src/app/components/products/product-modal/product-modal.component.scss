@@ -1,0 +1,43 @@
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  gap: 1.25rem;
+}
+
+.form-field {
+  width: 100%;
+
+  p-iconfield {
+    width: 100%;
+  }
+
+  input {
+    width: 100%;
+    
+    &.ng-invalid {
+      border-color: #e74c3c;
+      box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25);
+    }
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.form-button {
+  margin-top: 1rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.error-message {
+  color: #e74c3c;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+  font-weight: 400;
+}

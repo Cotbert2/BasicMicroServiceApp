@@ -19,7 +19,8 @@ import { InputIconModule } from 'primeng/inputicon';
 import { ToolbarModule } from 'primeng/toolbar';
 import { SplitButtonModule } from 'primeng/splitbutton'
 import { InputText } from 'primeng/inputtext';
-import { TooltipModule } from 'primeng/tooltip';  
+import { TooltipModule } from 'primeng/tooltip';
+import { ProductModalComponent } from "./product-modal/product-modal.component";  
 
 @Component({
   selector: 'app-products',
@@ -36,8 +37,9 @@ import { TooltipModule } from 'primeng/tooltip';
     ToolbarModule,
     SplitButtonModule,
     InputText,
-    TooltipModule
-  ],
+    TooltipModule,
+    ProductModalComponent
+],
   providers: [ConfirmationService, MessageService],
   templateUrl: './products.component.html',
   styleUrl: './products.component.scss'
@@ -50,6 +52,25 @@ export class ProductsComponent implements OnInit {
   products: IProduct[] = [];
   loading: boolean = true;
   globalFilterValue: string = '';
+
+  modalMode : 'create' | 'edit' | 'view' = 'create';
+  visibleModal: boolean = false;
+  selectedProduct?: IProduct;
+
+  onModalClose() {
+    console.log('Modal closed');
+    this.visibleModal = false;
+    this.modalMode = 'create';
+    this.selectedProduct = undefined;
+  }
+
+  viewProduct(product: IProduct) {
+    console.log('Viewing product:', product);
+    this.modalMode = 'view';
+    this.selectedProduct = product;
+    this.visibleModal = true;
+  }
+
 
   constructor(
     private productsService: ProductsService,
